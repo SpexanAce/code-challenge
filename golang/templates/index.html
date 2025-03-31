@@ -155,7 +155,7 @@
             <div id="map"></div>
         </div>
         <div class="location-info">
-            Selected Location: <span id="location-coords">52.5235, 13.4115</span>
+            Selected Location: <span id="location-coords">57.7047, 11.9684</span>
         </div>
         <div class="date-picker">
             <label for="date">Select Date:</label>
@@ -167,6 +167,7 @@
         </div>
         <div id="loading" class="loading">Loading...</div>
         <div id="error" class="error"></div>
+        <!-- Particulate Data Button -->
         <div id="particulate-data" class="data-container">
             <div class="data-section">
                 <h2>PM-10 Averages <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-20 μg/m³&#10;Moderate: 21-50 μg/m³&#10;Poor: 51-100 μg/m³&#10;Very Poor: 101-200 μg/m³&#10;Hazardous: >200 μg/m³">ⓘ</span></h2>
@@ -198,7 +199,8 @@
                     <span id="pm25-night">-</span>
                 </div>
             </div>
-        </div>
+        </div>  
+        <!-- Atmospheric Gases Data Button  -->
         <div id="gases-data" class="data-container">
             <div class="data-section">
                 <h2>Carbon Monoxide (CO) <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-4.4 mg/m³&#10;Moderate: 4.5-9.4 mg/m³&#10;Poor: 9.5-12.4 mg/m³&#10;Very Poor: 12.5-15.4 mg/m³&#10;Hazardous: >15.4 mg/m³">ⓘ</span></h2>
@@ -268,8 +270,17 @@
     <script>
         let map;
         let marker;
-        let currentLat = 52.5235;
-        let currentLng = 13.4115;
+        let currentLat = 57.7047;
+        let currentLng = 11.9684;
+        // Add cache for storing last fetched data
+        let lastFetchedData = {
+            particulate: null,
+            gases: null
+        };
+        let lastFetchParams = {
+            particulate: null,
+            gases: null
+        };
 
         function initMap() {
             map = L.map('map').setView([currentLat, currentLng], 13);
@@ -285,6 +296,9 @@
                 currentLat = e.target.getLatLng().lat;
                 currentLng = e.target.getLatLng().lng;
                 updateLocationDisplay();
+                // Clear cache when location changes
+                lastFetchedData = { particulate: null, gases: null };
+                lastFetchParams = { particulate: null, gases: null };
             });
 
             // Handle double click on map
@@ -299,6 +313,9 @@
                 currentLat = newLat;
                 currentLng = newLng;
                 updateLocationDisplay();
+                // Clear cache when location changes
+                lastFetchedData = { particulate: null, gases: null };
+                lastFetchParams = { particulate: null, gases: null };
             });
         }
 
@@ -330,20 +347,86 @@
             element.innerHTML = `${value.toFixed(2)} ${unit} <span class="air-quality ${qualityClass}">${qualityLabel}</span>`;
         }
 
-        function fetchData(type) {
+        function displayData(data, type) {
             const loading = document.getElementById('loading');
             const particulateData = document.getElementById('particulate-data');
             const gasesData = document.getElementById('gases-data');
+            
+            if (type === 'particulate') {
+                // PM10 thresholds (μg/m³)
+                const pm10Thresholds = { good: 20, moderate: 50, poor: 100, veryPoor: 200 };
+                updateAirQualityDisplay('pm10-morning', data.pm10.morning, pm10Thresholds);
+                updateAirQualityDisplay('pm10-afternoon', data.pm10.afternoon, pm10Thresholds);
+                updateAirQualityDisplay('pm10-night', data.pm10.night, pm10Thresholds);
+                
+                // PM2.5 thresholds (μg/m³)
+                const pm25Thresholds = { good: 10, moderate: 25, poor: 50, veryPoor: 100 };
+                updateAirQualityDisplay('pm25-morning', data.pm25.morning, pm25Thresholds);
+                updateAirQualityDisplay('pm25-afternoon', data.pm25.afternoon, pm25Thresholds);
+                updateAirQualityDisplay('pm25-night', data.pm25.night, pm25Thresholds);
+                
+                loading.style.display = 'none';
+                particulateData.style.display = 'block';
+                gasesData.style.display = 'none';
+            } else {
+                // CO thresholds (mg/m³)
+                const coThresholds = { good: 4.4, moderate: 9.4, poor: 12.4, veryPoor: 15.4 };
+                updateAirQualityDisplay('co-morning', data.co.morning, coThresholds, 'mg/m³');
+                updateAirQualityDisplay('co-afternoon', data.co.afternoon, coThresholds, 'mg/m³');
+                updateAirQualityDisplay('co-night', data.co.night, coThresholds, 'mg/m³');
+                
+                // NO2 thresholds (μg/m³)
+                const no2Thresholds = { good: 40, moderate: 80, poor: 180, veryPoor: 280 };
+                updateAirQualityDisplay('no2-morning', data.no2.morning, no2Thresholds);
+                updateAirQualityDisplay('no2-afternoon', data.no2.afternoon, no2Thresholds);
+                updateAirQualityDisplay('no2-night', data.no2.night, no2Thresholds);
+                
+                // SO2 thresholds (μg/m³)
+                const so2Thresholds = { good: 20, moderate: 80, poor: 365, veryPoor: 800 };
+                updateAirQualityDisplay('so2-morning', data.so2.morning, so2Thresholds);
+                updateAirQualityDisplay('so2-afternoon', data.so2.afternoon, so2Thresholds);
+                updateAirQualityDisplay('so2-night', data.so2.night, so2Thresholds);
+                
+                // O3 thresholds (μg/m³)
+                const o3Thresholds = { good: 50, moderate: 100, poor: 168, veryPoor: 208 };
+                updateAirQualityDisplay('o3-morning', data.o3.morning, o3Thresholds);
+                updateAirQualityDisplay('o3-afternoon', data.o3.afternoon, o3Thresholds);
+                updateAirQualityDisplay('o3-night', data.o3.night, o3Thresholds);
+                
+                loading.style.display = 'none';
+                particulateData.style.display = 'none';
+                gasesData.style.display = 'block';
+            }
+        }
+
+        function fetchData(type) {
+            const loading = document.getElementById('loading');
             const error = document.getElementById('error');
             const dateInput = document.getElementById('date');
             
             // Get selected date or use yesterday as default
             const selectedDate = dateInput.value || new Date(Date.now() - 86400000).toISOString().split('T')[0];
             
+            // Create current fetch parameters
+            const currentParams = {
+                lat: currentLat,
+                lng: currentLng,
+                date: selectedDate
+            };
+
+            // Check if we have cached data for these parameters
+            if (lastFetchedData[type] && 
+                lastFetchParams[type] && 
+                lastFetchParams[type].lat === currentParams.lat &&
+                lastFetchParams[type].lng === currentParams.lng &&
+                lastFetchParams[type].date === currentParams.date) {
+                // Use cached data
+                displayData(lastFetchedData[type], type);
+                return;
+            }
+
             // Reset UI state
             loading.style.display = 'block';
-            particulateData.style.display = 'none';
-            gasesData.style.display = 'none';
             error.style.display = 'none';
 
             fetch(`/api/pollution?lat=${currentLat}&lng=${currentLng}&type=${type}&date=${selectedDate}`)
@@ -356,71 +439,33 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (type === 'particulate') {
-                        // PM10 thresholds (μg/m³)
-                        const pm10Thresholds = { good: 20, moderate: 50, poor: 100, veryPoor: 200 };
-                        updateAirQualityDisplay('pm10-morning', data.pm10.morning, pm10Thresholds);
-                        updateAirQualityDisplay('pm10-afternoon', data.pm10.afternoon, pm10Thresholds);
-                        updateAirQualityDisplay('pm10-night', data.pm10.night, pm10Thresholds);
-                        
-                        // PM2.5 thresholds (μg/m³)
-                        const pm25Thresholds = { good: 10, moderate: 25, poor: 50, veryPoor: 100 };
-                        updateAirQualityDisplay('pm25-morning', data.pm25.morning, pm25Thresholds);
-                        updateAirQualityDisplay('pm25-afternoon', data.pm25.afternoon, pm25Thresholds);
-                        updateAirQualityDisplay('pm25-night', data.pm25.night, pm25Thresholds);
-                        
-                        loading.style.display = 'none';
-                        particulateData.style.display = 'block';
-                    } else {
-                        // CO thresholds (mg/m³)
-                        const coThresholds = { good: 4.4, moderate: 9.4, poor: 12.4, veryPoor: 15.4 };
-                        updateAirQualityDisplay('co-morning', data.co.morning, coThresholds, 'mg/m³');
-                        updateAirQualityDisplay('co-afternoon', data.co.afternoon, coThresholds, 'mg/m³');
-                        updateAirQualityDisplay('co-night', data.co.night, coThresholds, 'mg/m³');
-                        
-                        // NO2 thresholds (μg/m³)
-                        const no2Thresholds = { good: 40, moderate: 80, poor: 180, veryPoor: 280 };
-                        updateAirQualityDisplay('no2-morning', data.no2.morning, no2Thresholds);
-                        updateAirQualityDisplay('no2-afternoon', data.no2.afternoon, no2Thresholds);
-                        updateAirQualityDisplay('no2-night', data.no2.night, no2Thresholds);
-                        
-                        // SO2 thresholds (μg/m³)
-                        const so2Thresholds = { good: 20, moderate: 80, poor: 365, veryPoor: 800 };
-                        updateAirQualityDisplay('so2-morning', data.so2.morning, so2Thresholds);
-                        updateAirQualityDisplay('so2-afternoon', data.so2.afternoon, so2Thresholds);
-                        updateAirQualityDisplay('so2-night', data.so2.night, so2Thresholds);
-                        
-                        // O3 thresholds (μg/m³)
-                        const o3Thresholds = { good: 50, moderate: 100, poor: 168, veryPoor: 208 };
-                        updateAirQualityDisplay('o3-morning', data.o3.morning, o3Thresholds);
-                        updateAirQualityDisplay('o3-afternoon', data.o3.afternoon, o3Thresholds);
-                        updateAirQualityDisplay('o3-night', data.o3.night, o3Thresholds);
-                        
-                        loading.style.display = 'none';
-                        gasesData.style.display = 'block';
-                    }
+                    // Cache the data and parameters
+                    lastFetchedData[type] = data;
+                    lastFetchParams[type] = currentParams;
+                    
+                    // Display the data
+                    displayData(data, type);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     loading.style.display = 'none';
-                    error.textContent = `Error: ${error.message}`;
                     error.style.display = 'block';
+                    error.textContent = `Error: ${error.message}`;
                 });
         }
 
-        // Initialize map and date picker when page loads
-        window.onload = function() {
-            initMap();
-            
-            // Set default date to yesterday
+        // Initialize the map when the page loads
+        document.addEventListener('DOMContentLoaded', initMap);
+
+        // Set default date to yesterday and max date to today
+        document.addEventListener('DOMContentLoaded', function() {
             const dateInput = document.getElementById('date');
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            dateInput.value = yesterday;
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
             
-            // Set max date to today
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.max = today;
-        };
+            dateInput.max = today.toISOString().split('T')[0];
+            dateInput.value = yesterday.toISOString().split('T')[0];
+        });
     </script>
 </body>
 </html> 

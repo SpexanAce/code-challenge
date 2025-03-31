@@ -55,10 +55,10 @@ func handlePollutionData(w http.ResponseWriter, r *http.Request) {
 
 	// If not provided, use default values
 	if lat == "" {
-		lat = "52.5235"
+		lat = "57.7047"
 	}
 	if lng == "" {
-		lng = "13.4115"
+		lng = "11.9684"
 	}
 	if dataType == "" {
 		dataType = "particulate"
@@ -185,7 +185,7 @@ func handlePollutionData(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDebug(w http.ResponseWriter, r *http.Request) {
-	data, err := loadPollutionData("52.5235", "13.4115", "particulate", time.Now().AddDate(0, 0, -1).Format("2006-01-02"))
+	data, err := loadPollutionData("57.7047", "11.9684", "particulate", time.Now().AddDate(0, 0, -1).Format("2006-01-02"))
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error: %v", err), http.StatusInternalServerError)
 		return
