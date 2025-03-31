@@ -41,9 +41,26 @@
             margin: 10px 0;
             text-align: center;
         }
+        .date-picker {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+        }
+        .date-picker input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
         button {
-            display: block;
-            margin: 20px auto;
             padding: 10px 20px;
             font-size: 16px;
             background-color: #4CAF50;
@@ -55,6 +72,12 @@
         }
         button:hover {
             background-color: #45a049;
+        }
+        button.secondary {
+            background-color: #2196F3;
+        }
+        button.secondary:hover {
+            background-color: #1976D2;
         }
         .data-container {
             display: none;
@@ -91,16 +114,6 @@
             padding: 10px;
             margin: 10px 0;
         }
-        #debug {
-            display: none;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: monospace;
-            white-space: pre-wrap;
-        }
     </style>
 </head>
 <body>
@@ -112,10 +125,17 @@
         <div class="location-info">
             Selected Location: <span id="location-coords">52.5235, 13.4115</span>
         </div>
-        <button onclick="fetchData()">Get Pollution Data</button>
+        <div class="date-picker">
+            <label for="date">Select Date:</label>
+            <input type="date" id="date" value="">
+        </div>
+        <div class="button-container">
+            <button onclick="fetchData('particulate')">Get Particulate Data</button>
+            <button onclick="fetchData('gases')" class="secondary">Get Atmospheric Gases</button>
+        </div>
         <div id="loading" class="loading">Loading...</div>
         <div id="error" class="error"></div>
-        <div id="data" class="data-container">
+        <div id="particulate-data" class="data-container">
             <div class="data-section">
                 <h2>PM-10 Averages</h2>
                 <div class="data-row">
@@ -147,7 +167,68 @@
                 </div>
             </div>
         </div>
-        <div id="debug"></div>
+        <div id="gases-data" class="data-container">
+            <div class="data-section">
+                <h2>Carbon Monoxide (CO)</h2>
+                <div class="data-row">
+                    <span>Morning:</span>
+                    <span id="co-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="co-afternoon">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="co-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Nitrogen Dioxide (NO₂)</h2>
+                <div class="data-row">
+                    <span>Morning:</span>
+                    <span id="no2-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="no2-afternoon">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="no2-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Sulphur Dioxide (SO₂)</h2>
+                <div class="data-row">
+                    <span>Morning:</span>
+                    <span id="so2-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="so2-afternoon">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="so2-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Ozone (O₃)</h2>
+                <div class="data-row">
+                    <span>Morning:</span>
+                    <span id="o3-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="o3-afternoon">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="o3-night">-</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Leaflet JS -->
@@ -173,6 +254,20 @@
                 currentLng = e.target.getLatLng().lng;
                 updateLocationDisplay();
             });
+
+            // Handle double click on map
+            map.on('dblclick', function(e) {
+                const newLat = e.latlng.lat;
+                const newLng = e.latlng.lng;
+                
+                // Update marker position
+                marker.setLatLng([newLat, newLng]);
+                
+                // Update coordinates
+                currentLat = newLat;
+                currentLng = newLng;
+                updateLocationDisplay();
+            });
         }
 
         function updateLocationDisplay() {
@@ -180,66 +275,91 @@
                 `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)}`;
         }
 
-        function updateDebug(message) {
-            const debug = document.getElementById('debug');
-            debug.textContent += message + '\n';
-            debug.style.display = 'block';
-        }
-
-        function fetchData() {
+        function fetchData(type) {
             const loading = document.getElementById('loading');
-            const data = document.getElementById('data');
+            const particulateData = document.getElementById('particulate-data');
+            const gasesData = document.getElementById('gases-data');
             const error = document.getElementById('error');
-            const debug = document.getElementById('debug');
+            const dateInput = document.getElementById('date');
+            
+            // Get selected date or use yesterday as default
+            const selectedDate = dateInput.value || new Date(Date.now() - 86400000).toISOString().split('T')[0];
             
             // Reset UI state
             loading.style.display = 'block';
-            data.style.display = 'none';
+            particulateData.style.display = 'none';
+            gasesData.style.display = 'none';
             error.style.display = 'none';
-            debug.textContent = '';
-            debug.style.display = 'block';
 
-            updateDebug('Fetching data...');
-
-            fetch(`/api/pollution?lat=${currentLat}&lng=${currentLng}`)
+            fetch(`/api/pollution?lat=${currentLat}&lng=${currentLng}&type=${type}&date=${selectedDate}`)
                 .then(response => {
-                    updateDebug(`Response status: ${response.status}`);
                     if (!response.ok) {
                         return response.text().then(text => {
-                            updateDebug(`Error response: ${text}`);
                             throw new Error(text || `HTTP error! status: ${response.status}`);
                         });
                     }
                     return response.json();
                 })
                 .then(data => {
-                    updateDebug('Received data: ' + JSON.stringify(data, null, 2));
-                    
-                    // Update PM10 values
-                    document.getElementById('pm10-morning').textContent = `${data.pm10.morning.toFixed(2)} μg/m³`;
-                    document.getElementById('pm10-afternoon').textContent = `${data.pm10.afternoon.toFixed(2)} μg/m³`;
-                    document.getElementById('pm10-night').textContent = `${data.pm10.night.toFixed(2)} μg/m³`;
-                    
-                    // Update PM2.5 values
-                    document.getElementById('pm25-morning').textContent = `${data.pm25.morning.toFixed(2)} μg/m³`;
-                    document.getElementById('pm25-afternoon').textContent = `${data.pm25.afternoon.toFixed(2)} μg/m³`;
-                    document.getElementById('pm25-night').textContent = `${data.pm25.night.toFixed(2)} μg/m³`;
-                    
-                    loading.style.display = 'none';
-                    data.style.display = 'block';
-                    updateDebug('Data displayed successfully');
+                    if (type === 'particulate') {
+                        // Update PM10 values
+                        document.getElementById('pm10-morning').textContent = `${data.pm10.morning.toFixed(2)} μg/m³`;
+                        document.getElementById('pm10-afternoon').textContent = `${data.pm10.afternoon.toFixed(2)} μg/m³`;
+                        document.getElementById('pm10-night').textContent = `${data.pm10.night.toFixed(2)} μg/m³`;
+                        
+                        // Update PM2.5 values
+                        document.getElementById('pm25-morning').textContent = `${data.pm25.morning.toFixed(2)} μg/m³`;
+                        document.getElementById('pm25-afternoon').textContent = `${data.pm25.afternoon.toFixed(2)} μg/m³`;
+                        document.getElementById('pm25-night').textContent = `${data.pm25.night.toFixed(2)} μg/m³`;
+                        
+                        loading.style.display = 'none';
+                        particulateData.style.display = 'block';
+                    } else {
+                        // Update CO values
+                        document.getElementById('co-morning').textContent = `${data.co.morning.toFixed(2)} μg/m³`;
+                        document.getElementById('co-afternoon').textContent = `${data.co.afternoon.toFixed(2)} μg/m³`;
+                        document.getElementById('co-night').textContent = `${data.co.night.toFixed(2)} μg/m³`;
+                        
+                        // Update NO2 values
+                        document.getElementById('no2-morning').textContent = `${data.no2.morning.toFixed(2)} μg/m³`;
+                        document.getElementById('no2-afternoon').textContent = `${data.no2.afternoon.toFixed(2)} μg/m³`;
+                        document.getElementById('no2-night').textContent = `${data.no2.night.toFixed(2)} μg/m³`;
+                        
+                        // Update SO2 values
+                        document.getElementById('so2-morning').textContent = `${data.so2.morning.toFixed(2)} μg/m³`;
+                        document.getElementById('so2-afternoon').textContent = `${data.so2.afternoon.toFixed(2)} μg/m³`;
+                        document.getElementById('so2-night').textContent = `${data.so2.night.toFixed(2)} μg/m³`;
+                        
+                        // Update O3 values
+                        document.getElementById('o3-morning').textContent = `${data.o3.morning.toFixed(2)} μg/m³`;
+                        document.getElementById('o3-afternoon').textContent = `${data.o3.afternoon.toFixed(2)} μg/m³`;
+                        document.getElementById('o3-night').textContent = `${data.o3.night.toFixed(2)} μg/m³`;
+                        
+                        loading.style.display = 'none';
+                        gasesData.style.display = 'block';
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     loading.style.display = 'none';
                     error.textContent = `Error: ${error.message}`;
                     error.style.display = 'block';
-                    updateDebug('Error occurred: ' + error.message);
                 });
         }
 
-        // Initialize map when page loads
-        window.onload = initMap;
+        // Initialize map and date picker when page loads
+        window.onload = function() {
+            initMap();
+            
+            // Set default date to yesterday
+            const dateInput = document.getElementById('date');
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            dateInput.value = yesterday;
+            
+            // Set max date to today
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.max = today;
+        };
     </script>
 </body>
 </html> 
