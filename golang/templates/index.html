@@ -79,6 +79,12 @@
         button.secondary:hover {
             background-color: #1976D2;
         }
+        button.pollen {
+            background-color: #f3d421;
+        }
+        button.pollen:hover {
+            background-color: #d6ba1d;
+        }
         .data-container {
             display: none;
             margin-top: 20px;
@@ -164,10 +170,11 @@
         <div class="button-container">
             <button onclick="fetchData('particulate')">Get Particulate Data</button>
             <button onclick="fetchData('gases')" class="secondary">Get Atmospheric Gases</button>
+            <button onclick="fetchData('pollen')" class="pollen">Get Pollen Data</button>
         </div>
         <div id="loading" class="loading">Loading...</div>
         <div id="error" class="error"></div>
-        <!-- Particulate Data Button -->
+        <!-- Particulate Data  -->
         <div id="particulate-data" class="data-container">
             <div class="data-section">
                 <h2>PM-10 Averages <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-20 μg/m³&#10;Moderate: 21-50 μg/m³&#10;Poor: 51-100 μg/m³&#10;Very Poor: 101-200 μg/m³&#10;Hazardous: >200 μg/m³">ⓘ</span></h2>
@@ -200,7 +207,7 @@
                 </div>
             </div>
         </div>  
-        <!-- Atmospheric Gases Data Button  -->
+        <!-- Atmospheric Gases Data   -->
         <div id="gases-data" class="data-container">
             <div class="data-section">
                 <h2>Carbon Monoxide (CO) <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-4.4 mg/m³&#10;Moderate: 4.5-9.4 mg/m³&#10;Poor: 9.5-12.4 mg/m³&#10;Very Poor: 12.5-15.4 mg/m³&#10;Hazardous: >15.4 mg/m³">ⓘ</span></h2>
@@ -263,6 +270,100 @@
                 </div>
             </div>
         </div>
+        <!-- Pollen Data -->
+        <div id="pollen-data" class="data-container">
+            <div class="data-section">
+                <h2>Alder Pollen (Grains/m³) <span class="info-icon" title="Pollen levels in grains/m³&#10;Very High: >80&#10;High: 51-80&#10;Moderate: 21-50&#10;Low: 11-20&#10;Very Low: ≤10">ⓘ</span></h2>
+                <div class="data-row">
+                    <span>Morning:</span>   
+                    <span id="alder-pollen-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="alder-pollen-afternoon">-</span>
+                </div>  
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="alder-pollen-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Birch Pollen (Grains/m³) <span class="info-icon" title="Pollen levels in grains/m³&#10;Very High: >80&#10;High: 51-80&#10;Moderate: 21-50&#10;Low: 11-20&#10;Very Low: ≤10">ⓘ</span></h2>
+                <div class="data-row">
+                    <span>Morning:</span>   
+                    <span id="birch-pollen-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="birch-pollen-afternoon">-</span>
+                </div>  
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="birch-pollen-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Grass Pollen (Grains/m³) <span class="info-icon" title="Pollen levels in grains/m³&#10;Very High: >80&#10;High: 51-80&#10;Moderate: 21-50&#10;Low: 11-20&#10;Very Low: ≤10">ⓘ</span></h2>
+                <div class="data-row">
+                    <span>Morning:</span>   
+                    <span id="grass-pollen-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="grass-pollen-afternoon">-</span>
+                </div>  
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="grass-pollen-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Mugwort Pollen (Grains/m³) <span class="info-icon" title="Pollen levels in grains/m³&#10;Very High: >80&#10;High: 51-80&#10;Moderate: 21-50&#10;Low: 11-20&#10;Very Low: ≤10">ⓘ</span></h2>
+                <div class="data-row">
+                    <span>Morning:</span>   
+                    <span id="mugwort-pollen-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="mugwort-pollen-afternoon">-</span>
+                </div>  
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="mugwort-pollen-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Olive Pollen (Grains/m³) <span class="info-icon" title="Pollen levels in grains/m³&#10;Very High: >80&#10;High: 51-80&#10;Moderate: 21-50&#10;Low: 11-20&#10;Very Low: ≤10">ⓘ</span></h2>
+                <div class="data-row">
+                    <span>Morning:</span>   
+                    <span id="olive-pollen-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="olive-pollen-afternoon">-</span>
+                </div>  
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="olive-pollen-night">-</span>
+                </div>
+            </div>
+            <div class="data-section">
+                <h2>Ragweed Pollen (Grains/m³) <span class="info-icon" title="Pollen levels in grains/m³&#10;Very High: >80&#10;High: 51-80&#10;Moderate: 21-50&#10;Low: 11-20&#10;Very Low: ≤10">ⓘ</span></h2>
+                <div class="data-row">
+                    <span>Morning:</span>   
+                    <span id="ragweed-pollen-morning">-</span>
+                </div>
+                <div class="data-row">
+                    <span>Afternoon:</span>
+                    <span id="ragweed-pollen-afternoon">-</span>
+                </div>  
+                <div class="data-row">
+                    <span>Night:</span>
+                    <span id="ragweed-pollen-night">-</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Leaflet JS -->
@@ -275,11 +376,13 @@
         // Add cache for storing last fetched data
         let lastFetchedData = {
             particulate: null,
-            gases: null
+            gases: null,
+            pollen: null
         };
         let lastFetchParams = {
             particulate: null,
-            gases: null
+            gases: null,
+            pollen: null
         };
 
         function initMap() {
@@ -297,8 +400,8 @@
                 currentLng = e.target.getLatLng().lng;
                 updateLocationDisplay();
                 // Clear cache when location changes
-                lastFetchedData = { particulate: null, gases: null };
-                lastFetchParams = { particulate: null, gases: null };
+                lastFetchedData = { particulate: null, gases: null, pollen: null };
+                lastFetchParams = { particulate: null, gases: null, pollen: null };
             });
 
             // Handle double click on map
@@ -314,8 +417,8 @@
                 currentLng = newLng;
                 updateLocationDisplay();
                 // Clear cache when location changes
-                lastFetchedData = { particulate: null, gases: null };
-                lastFetchParams = { particulate: null, gases: null };
+                lastFetchedData = { particulate: null, gases: null, pollen: null };
+                lastFetchParams = { particulate: null, gases: null, pollen: null };
             });
         }
 
@@ -347,10 +450,39 @@
             element.innerHTML = `${value.toFixed(2)} ${unit} <span class="air-quality ${qualityClass}">${qualityLabel}</span>`;
         }
 
+        function updatePollenDisplay(elementId, value) {
+            const element = document.getElementById(elementId);
+            let pollenClass = 'quality-good';
+            let pollenLabel = 'Low';
+            
+            // Pollen levels in grains/m³
+            if (value > 80) {
+                pollenClass = 'quality-hazardous';
+                pollenLabel = 'Very High';
+            } else if (value > 50) {
+                pollenClass = 'quality-very-poor';
+                pollenLabel = 'High';
+            } else if (value > 20) {
+                pollenClass = 'quality-poor';
+                pollenLabel = 'Moderate';
+            } else if (value > 10) {
+                pollenClass = 'quality-moderate';
+                pollenLabel = 'Low';
+            }
+            
+            element.innerHTML = `${value.toFixed(1)} grains/m³ <span class="air-quality ${pollenClass}">${pollenLabel}</span>`;
+        }
+
         function displayData(data, type) {
             const loading = document.getElementById('loading');
             const particulateData = document.getElementById('particulate-data');
             const gasesData = document.getElementById('gases-data');
+            const pollenData = document.getElementById('pollen-data');
+            
+            // Hide all data containers first
+            particulateData.style.display = 'none';
+            gasesData.style.display = 'none';
+            pollenData.style.display = 'none';
             
             if (type === 'particulate') {
                 // PM10 thresholds (μg/m³)
@@ -367,7 +499,33 @@
                 
                 loading.style.display = 'none';
                 particulateData.style.display = 'block';
-                gasesData.style.display = 'none';
+            } else if (type === 'pollen') {
+                updatePollenDisplay('alder-pollen-morning', data.alder.morning);
+                updatePollenDisplay('alder-pollen-afternoon', data.alder.afternoon);
+                updatePollenDisplay('alder-pollen-night', data.alder.night);
+                
+                updatePollenDisplay('birch-pollen-morning', data.birch.morning);
+                updatePollenDisplay('birch-pollen-afternoon', data.birch.afternoon);
+                updatePollenDisplay('birch-pollen-night', data.birch.night);
+                
+                updatePollenDisplay('grass-pollen-morning', data.grass.morning);
+                updatePollenDisplay('grass-pollen-afternoon', data.grass.afternoon);
+                updatePollenDisplay('grass-pollen-night', data.grass.night);
+                
+                updatePollenDisplay('mugwort-pollen-morning', data.mugwort.morning);
+                updatePollenDisplay('mugwort-pollen-afternoon', data.mugwort.afternoon);
+                updatePollenDisplay('mugwort-pollen-night', data.mugwort.night);
+                
+                updatePollenDisplay('olive-pollen-morning', data.olive.morning);
+                updatePollenDisplay('olive-pollen-afternoon', data.olive.afternoon);
+                updatePollenDisplay('olive-pollen-night', data.olive.night);
+                
+                updatePollenDisplay('ragweed-pollen-morning', data.ragweed.morning);
+                updatePollenDisplay('ragweed-pollen-afternoon', data.ragweed.afternoon);
+                updatePollenDisplay('ragweed-pollen-night', data.ragweed.night);
+                
+                loading.style.display = 'none';
+                pollenData.style.display = 'block';
             } else {
                 // CO thresholds (mg/m³)
                 const coThresholds = { good: 4.4, moderate: 9.4, poor: 12.4, veryPoor: 15.4 };
@@ -394,7 +552,6 @@
                 updateAirQualityDisplay('o3-night', data.o3.night, o3Thresholds);
                 
                 loading.style.display = 'none';
-                particulateData.style.display = 'none';
                 gasesData.style.display = 'block';
             }
         }
@@ -468,4 +625,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

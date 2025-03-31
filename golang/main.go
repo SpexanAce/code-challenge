@@ -115,6 +115,94 @@ func handlePollutionData(w http.ResponseWriter, r *http.Request) {
 				Night:     da.PM25.Night,
 			},
 		}
+	} else if dataType == "pollen" {
+		response = struct {
+			ALDER struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			} `json:"alder"`
+			BIRCH struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			} `json:"birch"`
+			GRASS struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			} `json:"grass"`
+			MUGWORT struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			} `json:"mugwort"`
+			OLIVE struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			} `json:"olive"`
+			RAGWEED struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			} `json:"ragweed"`
+		}{
+			ALDER: struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			}{
+				Morning:   da.ALDER.Morning,
+				Afternoon: da.ALDER.Afternoon,
+				Night:     da.ALDER.Night,
+			},
+			BIRCH: struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			}{
+				Morning:   da.BIRCH.Morning,
+				Afternoon: da.BIRCH.Afternoon,
+				Night:     da.BIRCH.Night,
+			},
+			GRASS: struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			}{
+				Morning:   da.GRASS.Morning,
+				Afternoon: da.GRASS.Afternoon,
+				Night:     da.GRASS.Night,
+			},
+			MUGWORT: struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			}{
+				Morning:   da.MUGWORT.Morning,
+				Afternoon: da.MUGWORT.Afternoon,
+				Night:     da.MUGWORT.Night,
+			},
+			OLIVE: struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			}{
+				Morning:   da.OLIVE.Morning,
+				Afternoon: da.OLIVE.Afternoon,
+				Night:     da.OLIVE.Night,
+			},
+			RAGWEED: struct {
+				Morning   float64 `json:"morning"`
+				Afternoon float64 `json:"afternoon"`
+				Night     float64 `json:"night"`
+			}{
+				Morning:   da.RAGWEED.Morning,
+				Afternoon: da.RAGWEED.Afternoon,
+				Night:     da.RAGWEED.Night,
+			},
+		}
 	} else {
 		response = struct {
 			CO struct {
@@ -206,6 +294,36 @@ type DailyAverages struct {
 		Afternoon float64
 		Night     float64
 	}
+	ALDER struct {
+		Morning   float64
+		Afternoon float64
+		Night     float64
+	}
+	BIRCH struct {
+		Morning   float64
+		Afternoon float64
+		Night     float64
+	}
+	GRASS struct {
+		Morning   float64
+		Afternoon float64
+		Night     float64
+	}
+	MUGWORT struct {
+		Morning   float64
+		Afternoon float64
+		Night     float64
+	}
+	OLIVE struct {
+		Morning   float64
+		Afternoon float64
+		Night     float64
+	}
+	RAGWEED struct {
+		Morning   float64
+		Afternoon float64
+		Night     float64
+	}
 	CO struct {
 		Morning   float64
 		Afternoon float64
@@ -233,22 +351,34 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 
 	var data struct {
 		Hourly struct {
-			Time []string  `json:"time"`
-			PM10 []float64 `json:"pm10,omitempty"`
-			PM25 []float64 `json:"pm2_5,omitempty"`
-			CO   []float64 `json:"carbon_monoxide,omitempty"`
-			NO2  []float64 `json:"nitrogen_dioxide,omitempty"`
-			SO2  []float64 `json:"sulphur_dioxide,omitempty"`
-			O3   []float64 `json:"ozone,omitempty"`
+			Time    []string  `json:"time"`
+			PM10    []float64 `json:"pm10,omitempty"`
+			PM25    []float64 `json:"pm2_5,omitempty"`
+			ALDER   []float64 `json:"alder_pollen,omitempty"`
+			BIRCH   []float64 `json:"birch_pollen,omitempty"`
+			GRASS   []float64 `json:"grass_pollen,omitempty"`
+			MUGWORT []float64 `json:"mugwort_pollen,omitempty"`
+			OLIVE   []float64 `json:"olive_pollen,omitempty"`
+			RAGWEED []float64 `json:"ragweed_pollen,omitempty"`
+			CO      []float64 `json:"carbon_monoxide,omitempty"`
+			NO2     []float64 `json:"nitrogen_dioxide,omitempty"`
+			SO2     []float64 `json:"sulphur_dioxide,omitempty"`
+			O3      []float64 `json:"ozone,omitempty"`
 		} `json:"hourly"`
 		HourlyUnits struct {
-			Time string `json:"time"`
-			PM10 string `json:"pm10,omitempty"`
-			PM25 string `json:"pm2_5,omitempty"`
-			CO   string `json:"carbon_monoxide,omitempty"`
-			NO2  string `json:"nitrogen_dioxide,omitempty"`
-			SO2  string `json:"sulphur_dioxide,omitempty"`
-			O3   string `json:"ozone,omitempty"`
+			Time    string `json:"time"`
+			PM10    string `json:"pm10,omitempty"`
+			PM25    string `json:"pm2_5,omitempty"`
+			ALDER   string `json:"alder_pollen,omitempty"`
+			BIRCH   string `json:"birch_pollen,omitempty"`
+			GRASS   string `json:"grass_pollen,omitempty"`
+			MUGWORT string `json:"mugwort_pollen,omitempty"`
+			OLIVE   string `json:"olive_pollen,omitempty"`
+			RAGWEED string `json:"ragweed_pollen,omitempty"`
+			CO      string `json:"carbon_monoxide,omitempty"`
+			NO2     string `json:"nitrogen_dioxide,omitempty"`
+			SO2     string `json:"sulphur_dioxide,omitempty"`
+			O3      string `json:"ozone,omitempty"`
 		} `json:"hourly_units"`
 	}
 
@@ -264,6 +394,9 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 	var morningPM10, morningPM25 float64
 	var afternoonPM10, afternoonPM25 float64
 	var nightPM10, nightPM25 float64
+	var morningALDER, morningBIRCH, morningGRASS, morningMUGWORT, morningOLIVE, morningRAGWEED float64
+	var afternoonALDER, afternoonBIRCH, afternoonGRASS, afternoonMUGWORT, afternoonOLIVE, afternoonRAGWEED float64
+	var nightALDER, nightBIRCH, nightGRASS, nightMUGWORT, nightOLIVE, nightRAGWEED float64
 	var morningCO, morningNO2, morningSO2, morningO3 float64
 	var afternoonCO, afternoonNO2, afternoonSO2, afternoonO3 float64
 	var nightCO, nightNO2, nightSO2, nightO3 float64
@@ -281,6 +414,13 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 			if dataType == "particulate" {
 				morningPM10 += data.Hourly.PM10[idx]
 				morningPM25 += data.Hourly.PM25[idx]
+			} else if dataType == "pollen" {
+				morningALDER += data.Hourly.ALDER[idx]
+				morningBIRCH += data.Hourly.BIRCH[idx]
+				morningGRASS += data.Hourly.GRASS[idx]
+				morningMUGWORT += data.Hourly.MUGWORT[idx]
+				morningOLIVE += data.Hourly.OLIVE[idx]
+				morningRAGWEED += data.Hourly.RAGWEED[idx]
 			} else {
 				// Convert CO from μg/m³ to mg/m³ if needed
 				if data.HourlyUnits.CO == "μg/m³" {
@@ -300,6 +440,13 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 			if dataType == "particulate" {
 				afternoonPM10 += data.Hourly.PM10[idx]
 				afternoonPM25 += data.Hourly.PM25[idx]
+			} else if dataType == "pollen" {
+				afternoonALDER += data.Hourly.ALDER[idx]
+				afternoonBIRCH += data.Hourly.BIRCH[idx]
+				afternoonGRASS += data.Hourly.GRASS[idx]
+				afternoonMUGWORT += data.Hourly.MUGWORT[idx]
+				afternoonOLIVE += data.Hourly.OLIVE[idx]
+				afternoonRAGWEED += data.Hourly.RAGWEED[idx]
 			} else {
 				// Convert CO from μg/m³ to mg/m³ if needed
 				if data.HourlyUnits.CO == "μg/m³" {
@@ -318,6 +465,13 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 		if dataType == "particulate" {
 			nightPM10 += data.Hourly.PM10[idx]
 			nightPM25 += data.Hourly.PM25[idx]
+		} else if dataType == "pollen" {
+			nightALDER += data.Hourly.ALDER[idx]
+			nightBIRCH += data.Hourly.BIRCH[idx]
+			nightGRASS += data.Hourly.GRASS[idx]
+			nightMUGWORT += data.Hourly.MUGWORT[idx]
+			nightOLIVE += data.Hourly.OLIVE[idx]
+			nightRAGWEED += data.Hourly.RAGWEED[idx]
 		} else {
 			// Convert CO from μg/m³ to mg/m³ if needed
 			if data.HourlyUnits.CO == "μg/m³" {
@@ -339,6 +493,13 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 		if dataType == "particulate" {
 			da.PM10.Morning = morningPM10 / float64(morningCount)
 			da.PM25.Morning = morningPM25 / float64(morningCount)
+		} else if dataType == "pollen" {
+			da.ALDER.Morning = morningALDER / float64(morningCount)
+			da.BIRCH.Morning = morningBIRCH / float64(morningCount)
+			da.GRASS.Morning = morningGRASS / float64(morningCount)
+			da.MUGWORT.Morning = morningMUGWORT / float64(morningCount)
+			da.OLIVE.Morning = morningOLIVE / float64(morningCount)
+			da.RAGWEED.Morning = morningRAGWEED / float64(morningCount)
 		} else {
 			da.CO.Morning = morningCO / float64(morningCount)
 			da.NO2.Morning = morningNO2 / float64(morningCount)
@@ -350,6 +511,13 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 		if dataType == "particulate" {
 			da.PM10.Afternoon = afternoonPM10 / float64(afternoonCount)
 			da.PM25.Afternoon = afternoonPM25 / float64(afternoonCount)
+		} else if dataType == "pollen" {
+			da.ALDER.Afternoon = afternoonALDER / float64(afternoonCount)
+			da.BIRCH.Afternoon = afternoonBIRCH / float64(afternoonCount)
+			da.GRASS.Afternoon = afternoonGRASS / float64(afternoonCount)
+			da.MUGWORT.Afternoon = afternoonMUGWORT / float64(afternoonCount)
+			da.OLIVE.Afternoon = afternoonOLIVE / float64(afternoonCount)
+			da.RAGWEED.Afternoon = afternoonRAGWEED / float64(afternoonCount)
 		} else {
 			da.CO.Afternoon = afternoonCO / float64(afternoonCount)
 			da.NO2.Afternoon = afternoonNO2 / float64(afternoonCount)
@@ -361,6 +529,13 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 		if dataType == "particulate" {
 			da.PM10.Night = nightPM10 / float64(nightCount)
 			da.PM25.Night = nightPM25 / float64(nightCount)
+		} else if dataType == "pollen" {
+			da.ALDER.Night = nightALDER / float64(nightCount)
+			da.BIRCH.Night = nightBIRCH / float64(nightCount)
+			da.GRASS.Night = nightGRASS / float64(nightCount)
+			da.MUGWORT.Night = nightMUGWORT / float64(nightCount)
+			da.OLIVE.Night = nightOLIVE / float64(nightCount)
+			da.RAGWEED.Night = nightRAGWEED / float64(nightCount)
 		} else {
 			da.CO.Night = nightCO / float64(nightCount)
 			da.NO2.Night = nightNO2 / float64(nightCount)
@@ -374,6 +549,19 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 			da.PM10.Morning, da.PM10.Afternoon, da.PM10.Night)
 		log.Printf("Calculated averages - PM2.5: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
 			da.PM25.Morning, da.PM25.Afternoon, da.PM25.Night)
+	} else if dataType == "pollen" {
+		log.Printf("Calculated averages - ALDER: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
+			da.ALDER.Morning, da.ALDER.Afternoon, da.ALDER.Night)
+		log.Printf("Calculated averages - BIRCH: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
+			da.BIRCH.Morning, da.BIRCH.Afternoon, da.BIRCH.Night)
+		log.Printf("Calculated averages - GRASS: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
+			da.GRASS.Morning, da.GRASS.Afternoon, da.GRASS.Night)
+		log.Printf("Calculated averages - MUGWORT: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
+			da.MUGWORT.Morning, da.MUGWORT.Afternoon, da.MUGWORT.Night)
+		log.Printf("Calculated averages - OLIVE: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
+			da.OLIVE.Morning, da.OLIVE.Afternoon, da.OLIVE.Night)
+		log.Printf("Calculated averages - RAGWEED: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
+			da.RAGWEED.Morning, da.RAGWEED.Afternoon, da.RAGWEED.Night)
 	} else {
 		log.Printf("Calculated averages - CO: Morning=%.2f, Afternoon=%.2f, Night=%.2f",
 			da.CO.Morning, da.CO.Afternoon, da.CO.Night)
@@ -392,6 +580,8 @@ func loadPollutionData(lat, lng, dataType, date string) ([]byte, error) {
 	var hourlyParams string
 	if dataType == "particulate" {
 		hourlyParams = "pm10,pm2_5"
+	} else if dataType == "pollen" {
+		hourlyParams = "alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen"
 	} else {
 		hourlyParams = "carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone"
 	}
