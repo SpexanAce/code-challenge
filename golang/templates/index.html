@@ -100,6 +100,38 @@
             padding: 5px 0;
             border-bottom: 1px solid #eee;
         }
+        .air-quality {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .quality-good {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .quality-moderate {
+            background-color: #FFC107;
+            color: black;
+        }
+        .quality-poor {
+            background-color: #FF9800;
+            color: white;
+        }
+        .quality-very-poor {
+            background-color: #F44336;
+            color: white;
+        }
+        .quality-hazardous {
+            background-color: #9C27B0;
+            color: white;
+        }
+        .info-icon {
+            cursor: help;
+            margin-left: 5px;
+            color: #666;
+        }
         .loading {
             display: none;
             text-align: center;
@@ -137,7 +169,7 @@
         <div id="error" class="error"></div>
         <div id="particulate-data" class="data-container">
             <div class="data-section">
-                <h2>PM-10 Averages</h2>
+                <h2>PM-10 Averages <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-20 μg/m³&#10;Moderate: 21-50 μg/m³&#10;Poor: 51-100 μg/m³&#10;Very Poor: 101-200 μg/m³&#10;Hazardous: >200 μg/m³">ⓘ</span></h2>
                 <div class="data-row">
                     <span>Morning:</span>
                     <span id="pm10-morning">-</span>
@@ -152,7 +184,7 @@
                 </div>
             </div>
             <div class="data-section">
-                <h2>PM-2.5 Averages</h2>
+                <h2>PM-2.5 Averages <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-10 μg/m³&#10;Moderate: 11-25 μg/m³&#10;Poor: 26-50 μg/m³&#10;Very Poor: 51-100 μg/m³&#10;Hazardous: >100 μg/m³">ⓘ</span></h2>
                 <div class="data-row">
                     <span>Morning:</span>
                     <span id="pm25-morning">-</span>
@@ -169,7 +201,7 @@
         </div>
         <div id="gases-data" class="data-container">
             <div class="data-section">
-                <h2>Carbon Monoxide (CO)</h2>
+                <h2>Carbon Monoxide (CO) <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-4.4 mg/m³&#10;Moderate: 4.5-9.4 mg/m³&#10;Poor: 9.5-12.4 mg/m³&#10;Very Poor: 12.5-15.4 mg/m³&#10;Hazardous: >15.4 mg/m³">ⓘ</span></h2>
                 <div class="data-row">
                     <span>Morning:</span>
                     <span id="co-morning">-</span>
@@ -184,7 +216,7 @@
                 </div>
             </div>
             <div class="data-section">
-                <h2>Nitrogen Dioxide (NO₂)</h2>
+                <h2>Nitrogen Dioxide (NO₂) <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-40 μg/m³&#10;Moderate: 41-80 μg/m³&#10;Poor: 81-180 μg/m³&#10;Very Poor: 181-280 μg/m³&#10;Hazardous: >280 μg/m³">ⓘ</span></h2>
                 <div class="data-row">
                     <span>Morning:</span>
                     <span id="no2-morning">-</span>
@@ -199,7 +231,7 @@
                 </div>
             </div>
             <div class="data-section">
-                <h2>Sulphur Dioxide (SO₂)</h2>
+                <h2>Sulphur Dioxide (SO₂) <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-20 μg/m³&#10;Moderate: 21-80 μg/m³&#10;Poor: 81-365 μg/m³&#10;Very Poor: 366-800 μg/m³&#10;Hazardous: >800 μg/m³">ⓘ</span></h2>
                 <div class="data-row">
                     <span>Morning:</span>
                     <span id="so2-morning">-</span>
@@ -214,7 +246,7 @@
                 </div>
             </div>
             <div class="data-section">
-                <h2>Ozone (O₃)</h2>
+                <h2>Ozone (O₃) <span class="info-icon" title="WHO Guidelines:&#10;Good: 0-50 μg/m³&#10;Moderate: 51-100 μg/m³&#10;Poor: 101-168 μg/m³&#10;Very Poor: 169-208 μg/m³&#10;Hazardous: >208 μg/m³">ⓘ</span></h2>
                 <div class="data-row">
                     <span>Morning:</span>
                     <span id="o3-morning">-</span>
@@ -275,6 +307,29 @@
                 `${currentLat.toFixed(4)}, ${currentLng.toFixed(4)}`;
         }
 
+        function getAirQualityClass(value, thresholds) {
+            if (value <= thresholds.good) return 'quality-good';
+            if (value <= thresholds.moderate) return 'quality-moderate';
+            if (value <= thresholds.poor) return 'quality-poor';
+            if (value <= thresholds.veryPoor) return 'quality-very-poor';
+            return 'quality-hazardous';
+        }
+
+        function getAirQualityLabel(value, thresholds) {
+            if (value <= thresholds.good) return 'Good';
+            if (value <= thresholds.moderate) return 'Moderate';
+            if (value <= thresholds.poor) return 'Poor';
+            if (value <= thresholds.veryPoor) return 'Very Poor';
+            return 'Hazardous';
+        }
+
+        function updateAirQualityDisplay(elementId, value, thresholds, unit = 'μg/m³') {
+            const element = document.getElementById(elementId);
+            const qualityClass = getAirQualityClass(value, thresholds);
+            const qualityLabel = getAirQualityLabel(value, thresholds);
+            element.innerHTML = `${value.toFixed(2)} ${unit} <span class="air-quality ${qualityClass}">${qualityLabel}</span>`;
+        }
+
         function fetchData(type) {
             const loading = document.getElementById('loading');
             const particulateData = document.getElementById('particulate-data');
@@ -302,38 +357,44 @@
                 })
                 .then(data => {
                     if (type === 'particulate') {
-                        // Update PM10 values
-                        document.getElementById('pm10-morning').textContent = `${data.pm10.morning.toFixed(2)} μg/m³`;
-                        document.getElementById('pm10-afternoon').textContent = `${data.pm10.afternoon.toFixed(2)} μg/m³`;
-                        document.getElementById('pm10-night').textContent = `${data.pm10.night.toFixed(2)} μg/m³`;
+                        // PM10 thresholds (μg/m³)
+                        const pm10Thresholds = { good: 20, moderate: 50, poor: 100, veryPoor: 200 };
+                        updateAirQualityDisplay('pm10-morning', data.pm10.morning, pm10Thresholds);
+                        updateAirQualityDisplay('pm10-afternoon', data.pm10.afternoon, pm10Thresholds);
+                        updateAirQualityDisplay('pm10-night', data.pm10.night, pm10Thresholds);
                         
-                        // Update PM2.5 values
-                        document.getElementById('pm25-morning').textContent = `${data.pm25.morning.toFixed(2)} μg/m³`;
-                        document.getElementById('pm25-afternoon').textContent = `${data.pm25.afternoon.toFixed(2)} μg/m³`;
-                        document.getElementById('pm25-night').textContent = `${data.pm25.night.toFixed(2)} μg/m³`;
+                        // PM2.5 thresholds (μg/m³)
+                        const pm25Thresholds = { good: 10, moderate: 25, poor: 50, veryPoor: 100 };
+                        updateAirQualityDisplay('pm25-morning', data.pm25.morning, pm25Thresholds);
+                        updateAirQualityDisplay('pm25-afternoon', data.pm25.afternoon, pm25Thresholds);
+                        updateAirQualityDisplay('pm25-night', data.pm25.night, pm25Thresholds);
                         
                         loading.style.display = 'none';
                         particulateData.style.display = 'block';
                     } else {
-                        // Update CO values
-                        document.getElementById('co-morning').textContent = `${data.co.morning.toFixed(2)} μg/m³`;
-                        document.getElementById('co-afternoon').textContent = `${data.co.afternoon.toFixed(2)} μg/m³`;
-                        document.getElementById('co-night').textContent = `${data.co.night.toFixed(2)} μg/m³`;
+                        // CO thresholds (mg/m³)
+                        const coThresholds = { good: 4.4, moderate: 9.4, poor: 12.4, veryPoor: 15.4 };
+                        updateAirQualityDisplay('co-morning', data.co.morning, coThresholds, 'mg/m³');
+                        updateAirQualityDisplay('co-afternoon', data.co.afternoon, coThresholds, 'mg/m³');
+                        updateAirQualityDisplay('co-night', data.co.night, coThresholds, 'mg/m³');
                         
-                        // Update NO2 values
-                        document.getElementById('no2-morning').textContent = `${data.no2.morning.toFixed(2)} μg/m³`;
-                        document.getElementById('no2-afternoon').textContent = `${data.no2.afternoon.toFixed(2)} μg/m³`;
-                        document.getElementById('no2-night').textContent = `${data.no2.night.toFixed(2)} μg/m³`;
+                        // NO2 thresholds (μg/m³)
+                        const no2Thresholds = { good: 40, moderate: 80, poor: 180, veryPoor: 280 };
+                        updateAirQualityDisplay('no2-morning', data.no2.morning, no2Thresholds);
+                        updateAirQualityDisplay('no2-afternoon', data.no2.afternoon, no2Thresholds);
+                        updateAirQualityDisplay('no2-night', data.no2.night, no2Thresholds);
                         
-                        // Update SO2 values
-                        document.getElementById('so2-morning').textContent = `${data.so2.morning.toFixed(2)} μg/m³`;
-                        document.getElementById('so2-afternoon').textContent = `${data.so2.afternoon.toFixed(2)} μg/m³`;
-                        document.getElementById('so2-night').textContent = `${data.so2.night.toFixed(2)} μg/m³`;
+                        // SO2 thresholds (μg/m³)
+                        const so2Thresholds = { good: 20, moderate: 80, poor: 365, veryPoor: 800 };
+                        updateAirQualityDisplay('so2-morning', data.so2.morning, so2Thresholds);
+                        updateAirQualityDisplay('so2-afternoon', data.so2.afternoon, so2Thresholds);
+                        updateAirQualityDisplay('so2-night', data.so2.night, so2Thresholds);
                         
-                        // Update O3 values
-                        document.getElementById('o3-morning').textContent = `${data.o3.morning.toFixed(2)} μg/m³`;
-                        document.getElementById('o3-afternoon').textContent = `${data.o3.afternoon.toFixed(2)} μg/m³`;
-                        document.getElementById('o3-night').textContent = `${data.o3.night.toFixed(2)} μg/m³`;
+                        // O3 thresholds (μg/m³)
+                        const o3Thresholds = { good: 50, moderate: 100, poor: 168, veryPoor: 208 };
+                        updateAirQualityDisplay('o3-morning', data.o3.morning, o3Thresholds);
+                        updateAirQualityDisplay('o3-afternoon', data.o3.afternoon, o3Thresholds);
+                        updateAirQualityDisplay('o3-night', data.o3.night, o3Thresholds);
                         
                         loading.style.display = 'none';
                         gasesData.style.display = 'block';

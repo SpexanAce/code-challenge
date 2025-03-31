@@ -241,6 +241,15 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 			SO2  []float64 `json:"sulphur_dioxide,omitempty"`
 			O3   []float64 `json:"ozone,omitempty"`
 		} `json:"hourly"`
+		HourlyUnits struct {
+			Time string `json:"time"`
+			PM10 string `json:"pm10,omitempty"`
+			PM25 string `json:"pm2_5,omitempty"`
+			CO   string `json:"carbon_monoxide,omitempty"`
+			NO2  string `json:"nitrogen_dioxide,omitempty"`
+			SO2  string `json:"sulphur_dioxide,omitempty"`
+			O3   string `json:"ozone,omitempty"`
+		} `json:"hourly_units"`
 	}
 
 	if err := json.Unmarshal(raw, &data); err != nil {
@@ -249,6 +258,8 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 	}
 
 	log.Printf("Successfully parsed JSON. Found %d time entries", len(data.Hourly.Time))
+	log.Printf("Units - CO: %s, NO2: %s, SO2: %s, O3: %s",
+		data.HourlyUnits.CO, data.HourlyUnits.NO2, data.HourlyUnits.SO2, data.HourlyUnits.O3)
 
 	var morningPM10, morningPM25 float64
 	var afternoonPM10, afternoonPM25 float64
@@ -271,7 +282,12 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 				morningPM10 += data.Hourly.PM10[idx]
 				morningPM25 += data.Hourly.PM25[idx]
 			} else {
-				morningCO += data.Hourly.CO[idx]
+				// Convert CO from μg/m³ to mg/m³ if needed
+				if data.HourlyUnits.CO == "μg/m³" {
+					morningCO += data.Hourly.CO[idx] / 1000
+				} else {
+					morningCO += data.Hourly.CO[idx]
+				}
 				morningNO2 += data.Hourly.NO2[idx]
 				morningSO2 += data.Hourly.SO2[idx]
 				morningO3 += data.Hourly.O3[idx]
@@ -285,7 +301,12 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 				afternoonPM10 += data.Hourly.PM10[idx]
 				afternoonPM25 += data.Hourly.PM25[idx]
 			} else {
-				afternoonCO += data.Hourly.CO[idx]
+				// Convert CO from μg/m³ to mg/m³ if needed
+				if data.HourlyUnits.CO == "μg/m³" {
+					afternoonCO += data.Hourly.CO[idx] / 1000
+				} else {
+					afternoonCO += data.Hourly.CO[idx]
+				}
 				afternoonNO2 += data.Hourly.NO2[idx]
 				afternoonSO2 += data.Hourly.SO2[idx]
 				afternoonO3 += data.Hourly.O3[idx]
@@ -298,7 +319,12 @@ func parsePollutionData(raw []byte, dataType string) (DailyAverages, error) {
 			nightPM10 += data.Hourly.PM10[idx]
 			nightPM25 += data.Hourly.PM25[idx]
 		} else {
-			nightCO += data.Hourly.CO[idx]
+			// Convert CO from μg/m³ to mg/m³ if needed
+			if data.HourlyUnits.CO == "μg/m³" {
+				nightCO += data.Hourly.CO[idx] / 1000
+			} else {
+				nightCO += data.Hourly.CO[idx]
+			}
 			nightNO2 += data.Hourly.NO2[idx]
 			nightSO2 += data.Hourly.SO2[idx]
 			nightO3 += data.Hourly.O3[idx]
